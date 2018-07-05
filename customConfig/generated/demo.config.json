@@ -1,1 +1,9 @@
-{"title":"ff","PUBLIC_URL":"/demo"}
+{
+  "title": "demo",
+  "proxy": {
+    "/trend": {
+      "target": "http://47.95.13.52:3389/mock"
+    }
+  },
+  "PUBLIC_URL": "/demo"
+}

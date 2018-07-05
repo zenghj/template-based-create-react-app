@@ -245,7 +245,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       inject: true,
       template: paths.appHtml,
-      title: customAppConfig.htmlTitleField,
+      title: customAppConfig.htmlTitleField || 'React app',
       minify: {
         removeComments: true,
         collapseWhitespace: true,

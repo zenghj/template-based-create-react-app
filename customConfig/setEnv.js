@@ -68,6 +68,10 @@ const promise = new Promise((resolve, reject) => {
 
 })
 
+function ToBeautifyJson(obj) {
+  return obj && JSON.stringify(obj, null, 2);
+}
+
 async function generateConfigFile(appName) {
   const filePath = path.join(generatedDirPath, `${appName}.config.json`);
   if(!fs.existsSync(filePath)) {
@@ -77,7 +81,7 @@ async function generateConfigFile(appName) {
     config.PUBLIC_URL = await rl.rlquestion('enter "process.env.PUBLIC_URL" for webpack build: ');
     process.env.PUBLIC_UR = config.PUBLIC_URL;
     console.log(chalk.underline(`the generated config has been put at ${filePath}, you can modify it later if you need`))
-    fs.writeFileSync(filePath, JSON.stringify(config))
+    fs.writeFileSync(filePath, ToBeautifyJson(config))
   } else {
     const config = require(filePath);
     if(!config.PUBLIC_URL && !config.forceNoPublicUrl) {
@@ -87,7 +91,7 @@ async function generateConfigFile(appName) {
       } else {
         config.PUBLIC_URL = await rl.rlquestion('enter "process.env.PUBLIC_URL" for webpack build: ');
       }
-      fs.writeFileSync(filePath, JSON.stringify(config))
+      fs.writeFileSync(filePath, ToBeautifyJson(config))
     }
     process.env.PUBLIC_URL = config.PUBLIC_URL;
   }
