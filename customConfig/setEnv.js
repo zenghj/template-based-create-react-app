@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const readline = require('readline');
+const rl = require('./utils/readline')();
 const chalk = require('chalk');
 const pagesDir = path.resolve(__dirname, '../src/pages');
 const generatedDirPath = path.resolve(__dirname, './generated');
@@ -31,19 +31,6 @@ function walkPages() {
   return pages;
 }
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-function rlquestion(question) {
-  return new Promise((resolve, reject) => {
-    rl.question(question, answer => {
-      console.log('answer', answer)
-      resolve(answer);
-    })
-  })
-}
-
 const args = process.argv;
 const parsedArgs = parseArgs(args);
 
@@ -59,7 +46,7 @@ const promise = new Promise((resolve, reject) => {
     }, '');
     // const existAppList = existAppNames.join('\n');
     console.log(chalk.yellow("you haven't assign which app you are runing"))
-    rlquestion(`select your app's name, now you have these choices(enter the number below): \n${existAppList}\n`)
+    rl.rlquestion(`select your app's name, now you have these choices(enter the number below): \n${existAppList}\n`)
       .then(index => {
         if(typeof existAppNames[index] !== 'undefined') {
           appName = existAppNames[index];
@@ -86,24 +73,25 @@ async function generateConfigFile(appName) {
   if(!fs.existsSync(filePath)) {
     const config = {};
     console.log(chalk.yellow('This app is going to run for the first time, you have to input some info to generate a config file'))
-    config.title = await rlquestion('enter html <title></title> field name: ');
-    config.PUBLIC_URL = await rlquestion('enter "process.env.PUBLIC_URL" for webpack build: ');
+    config.title = await rl.rlquestion('enter html <title></title> field name: ');
+    config.PUBLIC_URL = await rl.rlquestion('enter "process.env.PUBLIC_URL" for webpack build: ');
     process.env.PUBLIC_UR = config.PUBLIC_URL;
     console.log(chalk.underline(`the generated config has been put at ${filePath}, you can modify it later if you need`))
     fs.writeFileSync(filePath, JSON.stringify(config))
   } else {
     const config = require(filePath);
     if(!config.PUBLIC_URL && !config.forceNoPublicUrl) {
-      let forceNoPublicUrl = await rlquestion('the "PUBLIC_URL" is empty, are you sure? yes|no: ');
+      let forceNoPublicUrl = await rl.rlquestion('the "PUBLIC_URL" is empty, are you sure? yes|no: ');
       if(forceNoPublicUrl.indexOf('y') > -1) {
         config.forceNoPublicUrl = true;
       } else {
-        config.PUBLIC_URL = await rlquestion('enter "process.env.PUBLIC_URL" for webpack build: ');
+        config.PUBLIC_URL = await rl.rlquestion('enter "process.env.PUBLIC_URL" for webpack build: ');
       }
       fs.writeFileSync(filePath, JSON.stringify(config))
     }
     process.env.PUBLIC_URL = config.PUBLIC_URL;
   }
+  rl.close();
   return true;
 }
 
