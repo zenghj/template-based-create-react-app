@@ -1,8 +1,10 @@
 const rl = require('./utils/readline')();
 const fs = require('fs');
+const fsExtra = require('fs-extra');
 const path = require('path');
 const chalk = require('chalk');
-const destPath = path.resolve(__dirname, '../src/apps');
+const appsDir = path.resolve(__dirname, '../src/apps');
+const demoAppPath = path.resolve(__dirname, '../src/apps/demo');
 
 (async function createModule() {
   let moduleName = await rl.rlquestion("input the new app's name, this will be used for create directory: ");
@@ -22,14 +24,18 @@ const destPath = path.resolve(__dirname, '../src/apps');
 })();
 
 function generateFiles (moduleName) {
-  const modulePath = path.join(destPath, moduleName);
+  const modulePath = path.join(appsDir, moduleName);
   return new Promise((resolve, reject) => {
     if(fs.existsSync(modulePath)) {
       reject(`模块名为${moduleName}的模块已经存在`)
     } else {
-      fs.mkdirSync(modulePath);
-      fs.createWriteStream(path.resolve(modulePath, 'index.js'));
-      resolve(modulePath);
+      fsExtra.copy(demoAppPath, path.join(appsDir, moduleName))
+        .then(() => {
+          resolve(modulePath);
+        })
+        .catch(err => {
+          reject(err);
+        }) 
     }
   })
 }
