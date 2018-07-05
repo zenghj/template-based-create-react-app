@@ -53,7 +53,6 @@ process.env.parsedArgs = parsedArgs;
 
 const promise = new Promise((resolve, reject) => {
   if(typeof appName === 'undefined') {
-
     const existAppNames = walkPages();
     const existAppList = existAppNames.reduce((sum, pageName, index) => {
       return sum + `${index}: ${pageName}\n`
@@ -64,7 +63,7 @@ const promise = new Promise((resolve, reject) => {
       .then(index => {
         if(typeof existAppNames[index] !== 'undefined') {
           appName = existAppNames[index];
-          process.env.PUBLIC_URL = `/${appName}`;
+          // process.env.PUBLIC_URL = `/${appName}`;
           process.env.APP_NAME = appName;
           console.log(`"${appName}" was selected`)
           generateConfigFile(appName).then(() => resolve(appName))
@@ -75,7 +74,7 @@ const promise = new Promise((resolve, reject) => {
       })
   } else {
     console.log(appName);
-    process.env.PUBLIC_URL = `/${appName}`;
+    // process.env.PUBLIC_URL = `/${appName}`;
     process.env.APP_NAME = appName;
     generateConfigFile(appName).then(() => resolve(appName))
   }
@@ -88,9 +87,22 @@ async function generateConfigFile(appName) {
     const config = {};
     console.log(chalk.yellow('This app is going to run for the first time, you have to input some info to generate a config file'))
     config.title = await rlquestion('enter html <title></title> field name: ');
-    config.PUBLIC_URL = process.env.PUBLIC_URL;
+    config.PUBLIC_URL = await rlquestion('enter "process.env.PUBLIC_URL" for webpack build: ');
+    process.env.PUBLIC_UR = config.PUBLIC_URL;
     console.log(chalk.underline(`the generated config has been put at ${filePath}, you can modify it later if you need`))
     fs.writeFileSync(filePath, JSON.stringify(config))
+  } else {
+    const config = require(filePath);
+    if(!config.PUBLIC_URL && !config.forceNoPublicUrl) {
+      let forceNoPublicUrl = await rlquestion('the "PUBLIC_URL" is empty, are you sure? yes|no: ');
+      if(forceNoPublicUrl.indexOf('y') > -1) {
+        config.forceNoPublicUrl = true;
+      } else {
+        config.PUBLIC_URL = await rlquestion('enter "process.env.PUBLIC_URL" for webpack build: ');
+      }
+      fs.writeFileSync(filePath, JSON.stringify(config))
+    }
+    process.env.PUBLIC_URL = config.PUBLIC_URL;
   }
   return true;
 }
