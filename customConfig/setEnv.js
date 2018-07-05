@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const rl = require('./utils/readline')();
 const chalk = require('chalk');
-const pagesDir = path.resolve(__dirname, '../src/pages');
+const appsDir = path.resolve(__dirname, '../src/apps');
 const generatedDirPath = path.resolve(__dirname, './generated');
 function parseArgs(arr) {
   let parsed = {};
@@ -18,9 +18,9 @@ function parseArgs(arr) {
   return parsed;
 }
 function walkPages() {
-  const files = fs.readdirSync(pagesDir);
+  const files = fs.readdirSync(appsDir);
   const pages = files && files.reduce((sum, fileName) => {
-    const filePath = path.join(pagesDir, fileName);
+    const filePath = path.join(appsDir, fileName);
     const stats = fs.statSync(filePath);
     if(stats && stats.isDirectory()) {
       sum.push(fileName);

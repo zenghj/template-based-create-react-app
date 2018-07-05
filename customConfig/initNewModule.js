@@ -2,10 +2,10 @@ const rl = require('./utils/readline')();
 const fs = require('fs');
 const path = require('path');
 const chalk = require('chalk');
-const destPath = path.resolve(__dirname, '../src/pages');
+const destPath = path.resolve(__dirname, '../src/apps');
 
 (async function createModule() {
-  let moduleName = await rl.rlquestion('input the new module name: ');
+  let moduleName = await rl.rlquestion("input the new app's name, this will be used for create directory: ");
   if(moduleName.trim() === '') {
     console.log(chalk.red(`模块名不能为空`))
     process.exit();
